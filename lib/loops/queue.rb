@@ -58,15 +58,19 @@ module Loops
     def create_client
       config['port'] ||= config['port'].to_i == 0 ? 61613 : config['port'].to_i
       config['host'] ||= 'localhost'
-
+      @app_root = Dir.pwd
+      config['log_dir'] ||= 'log/'
+      @lonsg_file = File.expand_path(File.join(@app_root, log_dir, "#{config['loop_name']}-#{Process.pid}.log"))
+      @log_file_handle = open(@log_file, "a")
+      @log_file_handle.sync = true
+      @log = Logger.new(@log_file_handle)
+      $stderr = @log_file_handle
+      @log.info "Starting Worker..."
       @client = Stomp::Client.open(config['user'], config['password'], config['host'], config['port'], true)
       setup_signals
     end
 
     def disconnect_client_and_exit
-      debug "Unsubscribing..."
-      @client.unsubscribe(name) rescue nil
-      @client.close() rescue nil
       exit(0)
     end
 

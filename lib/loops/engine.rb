@@ -10,11 +10,8 @@ class Loops::Engine
   end
 
   def load_config
-    # load and parse with erb
-    raw_config = File.read(Loops.config_file)
-    erb_config = ERB.new(raw_config).result
-
-    @config = YAML.load(erb_config)
+    puts "#{Loops.config_file}"
+    @config = YAML.load(File.read(Loops.config_file))
     @loops_config  = @config['loops']
     @global_config = {
       'poll_period'    => 1,
